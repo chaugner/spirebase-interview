@@ -6,7 +6,7 @@ Assume you have a service mesh of many microservices responsible for data exchan
 
 ```
 {
-    "keys" : "values"
+    "key" : "value"
 }
 ```
 
@@ -14,8 +14,8 @@ The receiver will add a uniuqe sequentail id such as:
 ```
 {
     "id" : 123123,
-    data : {
-        "keys" : "values"
+    "data" : {
+        "key" : "value"
     }
 }
 ```
@@ -30,8 +30,8 @@ To ensure downstream systems can use this information, we will be adding a new a
 ```
 {
     "id" : 123123,
-    data : {
-        "keys" : "values"
+    "data" : {
+        "key" : "value"
     },
     "archived" : "date-time-value"
 }
