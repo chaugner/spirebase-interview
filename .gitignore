@@ -1,11 +1,10 @@
 #STS eclipse
 *.classpath
 *.project
-*/.settings/*
-*/.springBeans
+**/.settings/**
 
 #MAVEN IDE
-*/target/*
+**/target/**
 
 #IDE logs
 /**/logs/*
