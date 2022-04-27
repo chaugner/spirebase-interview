@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spirebase.model.FileLog;
+import com.spirebase.repositories.FileLogRepository;
 import com.spirebase.repositories.FileRepository;
 import com.spirebase.resources.FileArchiveDto;
 
@@ -34,6 +36,9 @@ public class MonitorFileDameon implements Runnable {
 	
 	@Autowired
 	private FileRepository fileRepo;
+	
+	@Autowired
+	private FileLogRepository fileLogRepo;
 	
 	@Override
 	public void run() {
@@ -60,7 +65,6 @@ public class MonitorFileDameon implements Runnable {
 	@Transactional	
 	private void process() throws Throwable {
 		
-	
 		File dir = new File(dataFolder);
 
 		System.out.println("Getting all files in " + dir.getCanonicalPath() + " including those in subdirectories");
@@ -68,7 +72,6 @@ public class MonitorFileDameon implements Runnable {
 		List<File> files = (List<File>) FileUtils.listFiles(dir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
 		for (File file : files) {
 		
-			
 			com.spirebase.model.File dbFile = fileRepo.findByName(file.getCanonicalPath());
 			if (dbFile == null) {
 			
@@ -77,6 +80,11 @@ public class MonitorFileDameon implements Runnable {
 				
 				fileRepo.save(dbFile);
 				
+				FileLog dbLog = new FileLog();
+				dbLog.setFile(dbFile);
+				dbLog.setStatus("detected");
+				
+				fileLogRepo.save(dbLog);
 			
 				String content = IOUtils.toString(new FileInputStream(file), "UTF-8");
 				FileArchiveDto asJson = MAPPER.readValue(content, FileArchiveDto.class);
@@ -88,6 +96,13 @@ public class MonitorFileDameon implements Runnable {
 				BufferedWriter writer = new BufferedWriter(new FileWriter(file, false));
 				writer.write(updated);
 				writer.flush();
+			} else {
+				
+				FileLog dbLog = new FileLog();
+				dbLog.setFile(dbFile);
+				dbLog.setStatus("viewed");
+				
+				fileLogRepo.save(dbLog);
 			}
 		}
 	}
